@@ -17,7 +17,7 @@ public class RestauranteApplication {
 	@Configuration
 	public static class Myconfiguration {
 		@Bean
-		public WebMvcConfigurer corsConfigurer() {
+		public WebMvcConfigurer corsConfigurerCustom() {
 			return new WebMvcConfigurer() {
 				@Override
 				public void addCorsMappings(CorsRegistry registry) {
