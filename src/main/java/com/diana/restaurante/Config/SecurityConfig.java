@@ -9,10 +9,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.diana.restaurante.Jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+import java.util.Arrays;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -23,12 +27,25 @@ public class SecurityConfig {
         private final AuthenticationProvider authProvider;
 
         @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOrigins(Arrays.asList(
+                                "https://thorough-unity-production.up.railway.app",
+                                "http://localhost:3000"));
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(Arrays.asList("*"));
+                configuration.setAllowCredentials(true);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
+
+        @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 return http
                                 .csrf(csrf -> csrf.disable())
-                                .cors(cors -> cors.configurationSource(
-                                                request -> new org.springframework.web.cors.CorsConfiguration()
-                                                                .applyPermitDefaultValues()))
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ← ¡AQUÍ el cambio!
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/auth/**", "/api/**").permitAll()
                                                 .anyRequest().authenticated())
