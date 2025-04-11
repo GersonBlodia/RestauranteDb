@@ -2,6 +2,7 @@ package com.diana.restaurante.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,8 +13,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.diana.restaurante.Jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -27,7 +26,9 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 return http
                                 .csrf(csrf -> csrf.disable())
-                                .cors(withDefaults()) // ✅ Aquí se habilita CORS
+                                .cors(cors -> cors.configurationSource(
+                                                request -> new org.springframework.web.cors.CorsConfiguration()
+                                                                .applyPermitDefaultValues()))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/auth/**", "/api/**").permitAll()
                                                 .anyRequest().authenticated())
