@@ -13,6 +13,8 @@ import com.diana.restaurante.Jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,31 +26,15 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 return http
-                                .csrf(csrf -> csrf.disable()) // Desactivar CSRF para las API REST
-                                .cors(cors -> cors.configurationSource(
-                                                request -> new org.springframework.web.cors.CorsConfiguration()
-                                                                .applyPermitDefaultValues())) // Aplica configuración
-                                                                                              // CORS
+                                .csrf(csrf -> csrf.disable())
+                                .cors(withDefaults()) // ✅ Aquí se habilita CORS
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/auth/**", "/api/**", "/**").permitAll() // Las rutas
-                                                                                                           // de
-                                                                                                           // autenticación
-                                                                                                           // y
-                                                                                                           // la API
-                                                                                                           // están
-                                                                                                           // permitidas
-                                                .anyRequest().authenticated()) // El resto requiere autenticación
+                                                .requestMatchers("/auth/**", "/api/**").permitAll()
+                                                .anyRequest().authenticated())
                                 .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin
-                                                                                                         // sesiones, ya
-                                                                                                         // que es una
-                                                                                                         // API REST sin
-                                                                                                         // estado
-                                .authenticationProvider(authProvider) // Configura el proveedor de autenticación
-                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // Añade
-                                                                                                                      // el
-                                                                                                                      // filtro
-                                                                                                                      // JWT
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authenticationProvider(authProvider)
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                                 .build();
         }
 }
