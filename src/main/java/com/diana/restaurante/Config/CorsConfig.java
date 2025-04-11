@@ -10,14 +10,16 @@ public class CorsConfig {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
-
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("*")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowedOrigins("https://thorough-unity-production.up.railway.app") // Permitir todos los
+                                                                                            // orígenes (deberías
+                                                                                            // restringir esto en
+                                                                                            // producción)
+                        .allowedMethods("*") // Permitir todos los métodos HTTP
+                        .allowedHeaders("*") // Permitir todos los encabezados
+                        .allowCredentials(true); // Permitir credenciales (cookies, autenticación)
             }
         };
     }
