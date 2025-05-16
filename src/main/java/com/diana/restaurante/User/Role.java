@@ -2,6 +2,6 @@ package com.diana.restaurante.User;
 
 public enum Role {
     ADMIN,
-    ALMACENERO,
-    COCINERO
+    GERENTE,
+    MESERO // ✅ Esto debe existir
 }

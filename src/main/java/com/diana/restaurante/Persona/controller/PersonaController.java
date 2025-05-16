@@ -44,9 +44,13 @@ public class PersonaController {
 
     @PostMapping(value = "personas")
     public ResponseEntity<?> crear(@RequestBody Persona persona) {
+        if (persona.getDni() == null || !persona.getDni().matches("\\d{8}")) {
+            return ResponseEntity.badRequest().body("El DNI debe tener exactamente 8 dígitos numéricos.");
+        }
         if (personaService.existePorDni(persona.getDni())) {
             return ResponseEntity.badRequest().body("Ya existe una persona con ese DNI.");
         }
+
         return ResponseEntity.ok(personaService.guardar(persona));
     }
 
@@ -114,6 +118,20 @@ public class PersonaController {
             persona.setFechaNacimiento(personaActualizada.getFechaNacimiento());
 
         return ResponseEntity.ok(personaService.guardar(persona));
+    }
+
+    // GET: Obtener persona por DNI
+
+    @GetMapping(value = "personas/dni/{dni}")
+    public ResponseEntity<?> obtenerPorDni(@PathVariable String dni) {
+        return personaService.obtenerPorDni(dni)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping(value = "personas-disponibles")
+    public ResponseEntity<List<Persona>> listarNoEmpleados() {
+        return ResponseEntity.ok(personaService.listarNoEmpleados());
     }
 
 }

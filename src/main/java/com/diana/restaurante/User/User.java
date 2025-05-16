@@ -1,5 +1,6 @@
 package com.diana.restaurante.User;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,23 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.diana.restaurante.Persona.model.Persona;
 
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Data
 @Builder
@@ -34,30 +20,43 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "usuario", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }) })
 public class User implements UserDetails {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Usar AUTO_INCREMENT en MySQL
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "persona_id", referencedColumnName = "id", nullable = false)
+
     private Persona persona;
 
-    @Basic
     @Column(nullable = false)
     private String username;
-
-    @Column(nullable = false, unique = true)
-    private String email;
 
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Enumerated(EnumType.STRING)
     private Role rol;
 
+    @Column(nullable = false)
+    private Boolean estado = false;
+
+    @Column(name = "token_verificacion", length = 100)
+    private String tokenVerificacion;
+
+    @Column(name = "expiracion_token")
+    private LocalDateTime expiracionToken;
+
+    @Column(length = 255)
+    private String avatar;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(rol.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
 
     @Override
@@ -75,8 +74,9 @@ public class User implements UserDetails {
         return true;
     }
 
+    // Se usa el campo estado como bandera de activación
     @Override
     public boolean isEnabled() {
-        return true;
+        return Boolean.TRUE.equals(estado);
     }
 }
